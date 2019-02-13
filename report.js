@@ -16,13 +16,13 @@ function main() {
     'Conversions',
     'Cost / conv.'
   ];
-  var accountSpreadsheet = SpreadsheetApp.openByUrl("");
+  var accountSpreadsheet = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1zPzf7Pu5xH_DuWVeSdFZIMffEk8J8BVwjejhablGZks/edit");
+  accountSpreadsheet.setSpreadsheetTimeZone(AdWordsApp.currentAccount().getTimeZone());
   appendToSpreadsheetReport(accountSpreadsheet, columns, reportData);
 }
 
 function appendToSpreadsheetReport(spreadsheet, headers, rows) {
   var values = spreadsheet.getSheetValues(1, 1, 1, 1);
-  Logger.log(values);
   if (!values[0][0]) {
     spreadsheet.appendRow(headers);
   }
@@ -32,12 +32,16 @@ function appendToSpreadsheetReport(spreadsheet, headers, rows) {
 }
 
 function getReportData() {
-  var dateNow = new Date();
-  var yesterday = new Date(dateNow.getFullYear(), dateNow.getMonth(), dateNow.getDate() - 1);
+  var millis_per_day = 1000 * 60 * 60 * 24;
+  var now = new Date();
+  var yesterday = new Date(now.getTime() - millis_per_day);
   var result = [];
   var accountName = AdWordsApp.currentAccount().getName();
   var currencyCode = AdWordsApp.currentAccount().getCurrencyCode();
-  var reportDateString = Utilities.formatDate(yesterday, 'Asia/Jerusalem', 'd/M/yyyy');
+  var reportDateString = Utilities.formatDate(yesterday, 'Europe/Moscow', 'd/M/yyyy');
+  Logger.log(yesterday);
+  Logger.log(Utilities.formatDate(yesterday, 'Europe/Moscow', 'd/M/yyyy HH:mm:ss'));
+  Logger.log(reportDateString);
 
   var report = AdWordsApp.report("SELECT CampaignId, CampaignName, AdvertisingChannelType, Amount, Impressions, Clicks, Ctr, AverageCpc, Cost, Conversions " +
     "FROM CAMPAIGN_PERFORMANCE_REPORT " +
